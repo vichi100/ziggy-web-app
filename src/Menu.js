@@ -22,6 +22,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import MovieList from './MovieList';
 import { DropzoneDialog, DropzoneArea } from 'material-ui-dropzone';
 import axios from 'axios';
+
+import { connect } from 'react-redux';
+import { setDishArray, setClickedItem } from './reducer/Action';
 //https://github.com/Yuvaleros/material-ui-dropzone
 
 const SERVER_URL = 'http://flicksickserver.com';
@@ -55,45 +58,176 @@ const styles = (theme) => ({
 
 
 
+
 const Menu = (props) => {
     const { classes } = props;
     const [dishName, setDishName] = useState(null);
     const [details, setDetails] = useState(null);
-    const [quantity, setQuantity] = useState(null);
     const [price, setPrice] = useState(null);
+    const [quantity, setQuantity] = useState(null);
+    const [priceDetails, setPriceDetails] = useState([{
+
+        quantity: '',// full, half, portion, 1kg, 1/2kg
+        price: ''
+    }]);
     const [isVeg, setIsVeg] = useState(null);
     const [image, setImage] = useState(null);
-    const [dishArray, setDishArray] = useState([])
+    // const [dishArray, setDishArray] = useState([])
     const [error, setError] = useState(null);
+    const [open, setOpen] = useState(false);
+
+    const onChangeQuntity = (quantityX) => {
+        var isAbort = false;
+        priceDetails.map(item => {
+            if (item.quantity === quantityX) {
+                setError("Quantity already exist");
+                setOpen(true);
+                isAbort = true;
+            }
+        })
+        if (isAbort) {
+            return;
+        }
+
+        priceDetails.map(item => {
+            if (item.quantity === '') {
+                item.quantity = quantityX;
+
+            }
+        })
+
+        setQuantity(quantityX);
+
+    }
+
+    const onChangePrice = (priceX) => {
+        if (priceX && priceX.trim().length === 0) {
+            setError("Price is missing");
+            setOpen(true);
+            return;
+        }
+        console.log('onChangePrice priceDetails: ', priceDetails)
+        var isPriceSet = false
+        priceDetails.map(item => {
+            if (item.price === '') {
+                item.price = priceX;
+                isPriceSet = true;
+            }
+        })
+
+        if (!isPriceSet) {
+            setError("Quntity is missing");
+            setOpen(true);
+            return;
+        }
+        setPrice(priceX)
+    }
 
 
-    const addDish = () => {
+    const removePriceDetails = (e, itemX) => {
+        console.log("itemX: ", itemX)
+        const arr = priceDetails.filter(function (item) {
+            return item.price !== itemX.price && item.quantity !== itemX.quantity
+        });
+        if (arr && arr.length === 0) {
+            const y = {
+
+                quantity: '',// full, half, portion, 1kg, 1/2kg
+                price: ''
+            }
+            arr.push(y);
+        }
+        setPriceDetails([...arr])
+    }
+
+    const addPriceDetails = () => {
+        console.log('addPriceDetails1')
+        if (quantity && quantity.trim().length === 0) {
+            setError("Quantity is missing");
+            return
+        }
+        if (price && price.trim().length === 0) {
+            setError("Price is missing");
+            return
+        }
+        console.log('addPriceDetails2')
+        const arr = priceDetails.filter(function (item) {
+            return item.price !== '' && item.quantity !== ''
+        })
+
+        // const x = {
+        //     quantity: quantity,// full, half, portion, 1kg, 1/2kg
+        //     price: price,
+        // }
+
+        // arr.push(x);
+        const y = {
+
+            quantity: '',// full, half, portion, 1kg, 1/2kg
+            price: ''
+        }
+        setPrice('');
+        setQuantity('');
+        arr.push(y);
+        setPriceDetails([...arr])
+
+    }
+
+    const addToMenu = () => {
         if (dishName === null || dishName.trim().length === 0) {
             setError("Dish name is missing");
+            setOpen(true);
             return
         }
-        if (quantity === null || quantity.trim().length === 0) {
-            setError("Quantity is missing")
-            return
-        }
-        if (price === null || price.trim().length === 0) {
-            setError("Price is missing")
-            return
-        }
+
         if (isVeg === null) {
             setError("Is Veg value missing")
+            setOpen(true);
             return
         }
+        var isAnyPriceDetailsValueMissing = false
+        priceDetails.map(item => {
+            if (item.price === null || item.price.trim() === '') {
+                setError("Price is missing");
+                isAnyPriceDetailsValueMissing = true
+                return
+            }
+            if (item.quantity === null || item.quantity.trim() === '') {
+                setError("Quntity is missing");
+                isAnyPriceDetailsValueMissing = true;
+                return
+            }
+        })
+
+        if (isAnyPriceDetailsValueMissing) {
+            setOpen(true);
+            return
+        }
+
+        console.log("priceDetails: ", priceDetails)
 
         const dishObj = {
             dish_name: dishName,
             details: details,
-            price: price,
-            quantity: quantity,
+            price_details: priceDetails,
             is_veg: isVeg, // yes , no
         }
-        dishArray.push(dishObj)
-        setDishArray([...dishArray]);
+        // if dish name is alredy in menu the update dish values
+        var isUpdated = false;
+        props.dishArray.map(item => {
+            if (item.dish_name === dishName) {
+                item.details = details;
+                item.price_details = priceDetails;
+                item.is_veg = isVeg
+                isUpdated = true;
+            }
+        })
+        if (isUpdated) {
+            clearState();
+            return
+        }
+        props.dishArray.push(dishObj)
+        props.setDishArray([...props.dishArray]);
         clearState();
     }
 
@@ -102,9 +236,16 @@ const Menu = (props) => {
         setDetails('');
         setQuantity('');
         setPrice('');
+        setPriceDetails([{
+
+            quantity: '',// full, half, portion, 1kg, 1/2kg
+            price: ''
+        }]);
         setIsVeg('');
         setImage('');
         setError('');
+        setOpen(false);
+        props.setClickedItem(null)
     };
 
     const selectDishType = (event, valuesX) => {
@@ -121,12 +262,36 @@ const Menu = (props) => {
     const setSelectedDish = (dish) => {
         setDishName(dish.dish_name);
         setDetails(dish.details);
-        setQuantity(dish.quantity);
-        setPrice(dish.price);
+        setPriceDetails(dish.price_details)
         setIsVeg(dish.is_veg);
         setImage(dish.image);
         setError('');
     }
+
+    const setDishNameX = (name) => {
+        var isDishAlreadyInMenu = false;
+        setDishName(name);
+        props.dishArray.map(item => {
+            if (item.dish_name === name) {
+                setError("Dish already exist");
+                isDishAlreadyInMenu = true;
+                setOpen(true);
+                return;
+            }
+        });
+        if (isDishAlreadyInMenu) {
+            return;
+        }
+        setOpen(false);
+
+    }
+
+    const handleToClose = (event, reason) => {
+        console.log(reason);
+        if ('clickaway' === reason) return;
+        setOpen(false);
+
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -154,7 +319,7 @@ const Menu = (props) => {
                             <Typography style={{ fontWeight: '600', fontSize: 20 }}>Menu</Typography>
                         </div>
                         <MovieList
-                            dishArray={dishArray}
+                            // dishArray={props.dishArray}
                             setSelectedDish={(movieData) => setSelectedDish(movieData)}
                             classes={{ listItemClicked: 'clickedItemStyle', listItemNotClicked: '' }}
                         />
@@ -174,7 +339,7 @@ const Menu = (props) => {
                             // type={this.state.showPassword ? 'text' : 'password'}
                             label="Dish Name"
                             value={dishName}
-                            onChange={(e) => setDishName(e.target.value)}
+                            onChange={(e) => setDishNameX(e.target.value)}
                         />
                         <TextField
                             multiline
@@ -191,37 +356,89 @@ const Menu = (props) => {
                             onChange={(e) => setDetails(e.target.value)}
                         />
 
-                        <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <TextField
-                                id="quantity"
-                                autoComplete="off"
-                                className={classes.textField}
-                                variant="outlined"
-                                // type={this.state.showPassword ? 'text' : 'password'}
-                                label="Quantity"
-                                // InputLabelProps={{
-                                //     shrink: values.runtime ? true : false
-                                // }}
-                                type={'tel'}
-                                value={quantity}
-                                style={{ width: 300 }}
-                                onChange={(e) => setQuantity(e.target.value)}
-                            />
-                            <TextField
-                                id="price"
-                                autoComplete="off"
-                                className={classes.textField}
-                                variant="outlined"
-                                type={'tel'}
-                                // type={this.state.showPassword ? 'text' : 'password'}
-                                label="Price"
-                                value={price}
-                                style={{ width: 300 }}
-                                onChange={(e) => setPrice(e.target.value)}
-                            />
+                        {priceDetails && priceDetails.length > 0 ?
+                            priceDetails.map(item => {
+                                return (
 
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: "flex-end" }}>
+                                    item.price && item.price.length > 0 ?
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
+                                            <TextField
+                                                id="quantity"
+                                                autoComplete="off"
+                                                className={classes.textField}
+                                                variant="outlined"
+                                                // type={this.state.showPassword ? 'text' : 'password'}
+                                                label="Quantity"
+                                                InputLabelProps={{
+                                                    shrink: item.quantity ? true : false
+                                                }}
+                                                type={'tel'}
+                                                // defaultValue={item.quantity}
+                                                value={item.quantity}
+                                                style={{ width: 300 }}
+                                            // onChange={(e) => setQuantity(e.target.value)}
+                                            />
+                                            <TextField
+                                                id="price"
+                                                autoComplete="off"
+                                                className={classes.textField}
+                                                variant="outlined"
+                                                type={'tel'}
+                                                // type={this.state.showPassword ? 'text' : 'password'}
+                                                label="Price"
+                                                InputLabelProps={{
+                                                    shrink: item.price ? true : false
+                                                }}
+                                                // defaultValue={item.price}
+                                                value={item.price}
+                                                style={{ width: 300 }}
+                                            // onChange={(e) => setPrice(e.target.value)}
+                                            />
+
+                                            {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
+                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "#FF0000", cursor: "pointer" }}>X</Typography>
+                                            </div> : null}
+
+                                        </div>
+                                        : <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
+                                            <TextField
+                                                id="quantity"
+                                                autoComplete="off"
+                                                className={classes.textField}
+                                                variant="outlined"
+                                                // type={this.state.showPassword ? 'text' : 'password'}
+                                                label="Quantity"
+                                                // InputLabelProps={{
+                                                //     shrink: values.runtime ? true : false
+                                                // }}
+                                                type={'tel'}
+                                                value={quantity}
+                                                style={{ width: 300 }}
+                                                onChange={(e) => onChangeQuntity(e.target.value)}
+                                            />
+                                            <TextField
+                                                id="price"
+                                                autoComplete="off"
+                                                className={classes.textField}
+                                                variant="outlined"
+                                                type={'tel'}
+                                                // type={this.state.showPassword ? 'text' : 'password'}
+                                                label="Price"
+                                                value={price}
+                                                style={{ width: 300 }}
+                                                onChange={(e) => onChangePrice(e.target.value)}
+                                            />
+
+                                            {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
+                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "#FF0000", cursor: "pointer" }}>X</Typography>
+                                            </div> : null}
+
+                                        </div>
+                                )
+                            })
+
+                            : null}
+                        <div style={{ display: 'flex', justifyContent: "flex-end" }} onClick={() => addPriceDetails()}>
                             <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 12, color: "#00BFFF" }}>Add More Quantity / Price</Typography>
                         </div>
 
@@ -288,7 +505,6 @@ const Menu = (props) => {
                     }}
                 >
 
-
                     <Button
                         style={{
                             border: '0.3px solid rgba(102,205,170, .9)',
@@ -297,16 +513,56 @@ const Menu = (props) => {
                             marginLeft: 90,
                             marginTop: 20
                         }}
-                        onClick={() => addDish()}
+                        onClick={() => clearState()}
                     >
-                        ADD MORE DISH
+                        CLEAR
+                    </Button>
+                    <Button
+                        style={{
+                            border: '0.3px solid rgba(102,205,170, .9)',
+                            height: 45,
+                            width: 200,
+                            marginLeft: 90,
+                            marginTop: 20
+                        }}
+                        onClick={() => addToMenu()}
+                    >
+                        ADD TO MENU
                     </Button>
                 </div>
 
             </Container>
 
+            <Snackbar
+                anchorOrigin={{
+                    horizontal: 'left',
+                    vertical: 'bottom'
+                }}
+                open={open}
+                autoHideDuration={null}
+                message={error}
+                onClose={handleToClose}
+                action={
+                    <React.Fragment>
+                        <IconButton size="small" aria-label="close" color="inherit" onClick={handleToClose}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </React.Fragment>
+                }
+            />
+
         </ThemeProvider>
     );
 };
 
-export default withStyles(styles)(Menu);
+const mapStateToProps = (state) => ({
+    dishArray: state.AppReducer.dishArray
+});
+
+const mapDispatchToProps = {
+    setDishArray,
+    setClickedItem
+};
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Menu));
+
+// export default withStyles(styles)(Menu);

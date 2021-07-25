@@ -4,8 +4,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DoneIcon from '@material-ui/icons/Done';
+import CancelIcon from '@material-ui/icons/Cancel';
 import Divider from '@material-ui/core/Divider';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { setDishArray, setClickedItem } from './reducer/Action';
 
 const SERVER_URL = 'http://flicksickserver.com';
 // const SERVER_URL_PROD = 'http://flicksickserver.com';
@@ -16,8 +19,8 @@ const SERVER_URL = 'http://flicksickserver.com';
 
 
 const MovieList = (props) => {
-	const { classes, setSelectedDish, dishArray } = props;
-	const [clickedItem, setClickedItem] = useState(null);
+	const { classes, setSelectedDish } = props;
+	// const [clickedItem, setClickedItem] = useState(null);
 	const [listItems, setListItems] = useState([]);
 	const [trendingMovieList, setTrendingMovieList] = useState([]);
 
@@ -50,7 +53,7 @@ const MovieList = (props) => {
 
 	const handleClick = (item) => {
 		console.log('item', item);
-		setClickedItem(item.dish_name);
+		props.setClickedItem(item.dish_name);
 		setSelectedDish(item);
 		// this.setState({
 		// 	clickedItem: item.id
@@ -60,35 +63,46 @@ const MovieList = (props) => {
 	useEffect(
 
 		() => {
-			console.log("dishArray: ", dishArray)
-			if (dishArray.length > 0 || clickedItem) {
-				initList();
-			}
+			console.log("dishArray: ", props.dishArray)
+
+			initList();
+
 		},
-		[clickedItem, dishArray]
+		[props.clickedItem, props.dishArray]
 	);
 
+	const removeFromMenu = (itemX) => {
+		console.log('removeFromMenu item: ', itemX);
+		const arr = props.dishArray.filter(function (item) {
+			return item.dish_name !== itemX.dish_name
+		})
+		console.log('removeFromMenu arr: ', arr);
+		props.setDishArray([...arr]);
+
+	}
+
 	const initList = () => {
-		console.log("dishList: ", dishArray)
-		let listItemsX = dishArray.map((item) => (
-			<div>
+		console.log("dishList: ", props.dishArray)
+		let listItemsX = props.dishArray.map((item) => (
+			<div >
 				<ListItem
 					key={item.dish_name}
 					className={
-						clickedItem && clickedItem === item.dish_name ? (
+						props.clickedItem && props.clickedItem === item.dish_name ? (
 							classes.listItemClicked
 						) : (
 							classes.listItemNotClicked
 						)
 					}
-					onClick={() => handleClick(item)}
+
 				>
-					<ListItemIcon>
-						{clickedItem === item.dish_name && (
+					<ListItemIcon >
+						{props.clickedItem && props.clickedItem === item.dish_name && (
 							<DoneIcon style={{ color: 'rgb(239, 239, 239)', fontSize: '2.2rem' }} />
 						)}
 					</ListItemIcon>
-					<ListItemText primary={item.dish_name} />
+					<ListItemText primary={item.dish_name} onClick={() => handleClick(item)} style={{ cursor: "pointer" }} />
+					<CancelIcon style={{ color: 'rgb(239, 239, 239)', fontSize: '14', marginLeft: 20 }} onClick={() => removeFromMenu(item)} />
 				</ListItem>
 				<Divider />
 			</div>
@@ -100,4 +114,14 @@ const MovieList = (props) => {
 	return <List style={{ maxHeight: 500, overflow: 'auto' }}>{listItems}</List>;
 };
 
-export default MovieList;
+// export default MovieList;
+const mapStateToProps = (state) => ({
+	dishArray: state.AppReducer.dishArray,
+	clickedItem: state.AppReducer.clickedItem
+});
+
+const mapDispatchToProps = {
+	setDishArray,
+	setClickedItem
+};
+export default connect(mapStateToProps, mapDispatchToProps)(MovieList);

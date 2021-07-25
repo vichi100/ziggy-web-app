@@ -273,6 +273,8 @@ const App = (props) => {
         // searchMovie();
     };
 
+
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from '@material-ui/styles';
-import { navigate } from "hookrouter";
+import { useHistory } from 'react-router-dom';
 
 import {
     Container,
@@ -58,6 +58,7 @@ const styles = (theme) => ({
 
 const App = (props) => {
     const { classes } = props;
+    const history = useHistory();
     const [title, setTitle] = useState(null);
     const [releaseYear, setReleaseYear] = useState(null);
     const [genresDict, setGenresDict] = useState({});
@@ -253,7 +254,7 @@ const App = (props) => {
 
     const onSave = () => {
         console.log('title: ', title);
-        navigate('/menu')
+        history.push('/menu')
 
     };
 
@@ -508,6 +509,162 @@ const App = (props) => {
                 >
                     {error ? error : null}
                 </Typography>
+                {/* </div> */}
+
+
+
+                <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginTop: 50 }}>
+                    <div style={{ position: 'relative', top: -15, left: 15 }}>
+                        <Typography style={{ fontWeight: '600', fontSize: 20 }}>Menu</Typography>
+                    </div>
+
+                    <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginTop: 30, margin: 50 }}>
+                        <div style={{ position: 'relative', top: -15, left: 15 }}>
+                            <Typography style={{ fontWeight: '600', fontSize: 20 }}>Dish</Typography>
+                        </div>
+
+
+                        <TextField
+                            id="dish_name"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            label="Dish Name"
+                            value={title}
+                            onChange={(e) => onChangeTitle(e)}
+                        />
+                        <TextField
+                            multiline
+                            id="details"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            // InputLabelProps={{
+                            //     shrink: values.overview ? true : false
+                            // }}
+                            label="Details / Ingredients"
+                            value={values.overview}
+                            onChange={(e) => handleInputChange(e)}
+                        />
+                        <TextField
+                            id="landmark"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            label="Landmark"
+                            value={title}
+                            onChange={(e) => onChangeTitle(e)}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <TextField
+                                id="quantity"
+                                autoComplete="off"
+                                className={classes.textField}
+                                variant="outlined"
+                                // type={this.state.showPassword ? 'text' : 'password'}
+                                label="Quantity"
+                                // InputLabelProps={{
+                                //     shrink: values.runtime ? true : false
+                                // }}
+                                type={'tel'}
+                                value={values.runtime}
+                                style={{ width: 300 }}
+                                onChange={(e) => handleInputChange(e)}
+                            />
+                            <TextField
+                                id="price"
+                                autoComplete="off"
+                                className={classes.textField}
+                                variant="outlined"
+                                type={'tel'}
+                                // type={this.state.showPassword ? 'text' : 'password'}
+                                label="Price"
+                                value={releaseYear}
+                                style={{ width: 300 }}
+                                onChange={(e) => onChangeReleaseYear(e)}
+                            />
+
+                        </div>
+
+                        <div style={{ flex: 1, flexDirection: "column" }}>
+
+                            <div style={{ display: 'flex', flexDirection: 'row', margin: 15 }}>
+                                <Typography style={{ textAlign: 'center', marginTop: 30 }}>Is Veg ? </Typography>
+                                <div style={{ marginLeft: 50 }}>
+                                    <RadioGroup
+                                        aria-label="mediaType"
+                                        name="mediaType"
+                                        value={media}
+                                        onChange={selectMediaType}
+                                    >
+                                        <FormControlLabel
+                                            value="yes"
+                                            control={<Radio checked={media && media === 'movie' ? true : false} />}
+                                            label="Yes"
+                                        />
+                                        <FormControlLabel
+                                            value="no"
+                                            control={<Radio checked={media && media === 'series' ? true : false} />}
+                                            label="No"
+                                        />
+                                    </RadioGroup>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
+                                <Button
+                                    style={{ border: '0.3px solid rgba(105,105,105, .9)' }}
+                                    onClick={() => handleBackdropOpen()}
+                                >
+                                    Add Image
+                                </Button>
+                                <Typography
+                                    style={{
+                                        fontWeight: '500',
+                                        fontSize: 16,
+                                        marginLeft: 50,
+                                        color: 'rgba(222,184,135, .9)'
+                                    }}
+                                >
+                                    {backdropImage ? backdropImage[0].name : null}
+                                </Typography>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {dishArray}
+
+                    <div
+                        style={{
+                            flexDirection: 'row',
+                            margin: 15,
+                            display: 'flex',
+                            justifyContent: "flex-end"
+                            // alignContent: 'flex-end',
+                            // alignItems: 'flex-end'
+                        }}
+                    >
+
+
+                        <Button
+                            style={{
+                                border: '0.3px solid rgba(102,205,170, .9)',
+                                height: 45,
+                                width: 200,
+                                marginLeft: 90,
+                                marginTop: 20
+                            }}
+                            onClick={() => addDish()}
+                        >
+                            ADD MORE DISH
+                        </Button>
+                    </div>
+
+                </div>
+
 
 
             </Container>

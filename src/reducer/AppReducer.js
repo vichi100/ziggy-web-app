@@ -2,7 +2,8 @@ import { ACTION_TYPES } from './ActionType';
 
 const initialState = {
 	dishArray: [],
-	clickedItem: null
+	clickedItem: null,
+	restaurantDetails: null
 };
 const AppReducer = (state = initialState, action) => {
 	switch (action.type) {
@@ -19,10 +20,12 @@ const AppReducer = (state = initialState, action) => {
 				...state,
 				clickedItem: action.payload
 			};
-
-
-
-
+		case ACTION_TYPES.SET_RESTAURANT_DETAILS:
+			console.log("SET_RESTAURANT_DETAILS");
+			return {
+				...state,
+				restaurantDetails: action.payload
+			};
 		default:
 			console.log("Default");
 			return state;

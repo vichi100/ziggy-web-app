@@ -25,7 +25,7 @@ import { DropzoneDialog, DropzoneArea } from 'material-ui-dropzone';
 import axios from 'axios';
 
 import { connect } from 'react-redux';
-import { setDishArray, setClickedItem } from './reducer/Action';
+import { setDishArray, setClickedItem, setRestaurantDetails } from './reducer/Action';
 
 //https://github.com/Yuvaleros/material-ui-dropzone
 
@@ -64,6 +64,8 @@ const App = (props) => {
     const { classes } = props;
     const [name, setName] = useState(null);
     const [speciality, setSpeciality] = useState(null);
+    const [mobile, setMobile] = useState(null);
+    const [otherMobile, setOtherMobile] = useState(null);
     const [address, setAddress] = useState(null);
     const [landmark, setLandMark] = useState(null);
     const [city, setCity] = useState(null);
@@ -73,10 +75,30 @@ const App = (props) => {
     const [latitude, setLatitude] = useState(null);
     const [isPureVeg, setIsPureVeg] = useState(null);
     const [openBackdropUpload, setOpenBackdropUpload] = useState(false);
-    const [backdropImage, setBackdropImage] = useState(null);
+    const [image, setImage] = useState(null);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
     const [responseMessage, setResponseMessage] = useState(null);
+
+    useEffect(() => {
+        console.log("back");
+        if (props.restaurantDetails) {
+            console.log("back: ", props.restaurantDetails);
+            setName(props.restaurantDetails.name);
+            setSpeciality(props.restaurantDetails.speciality);
+            setMobile(props.restaurantDetails.mobile);
+            setOtherMobile(props.restaurantDetails.otherMobile)
+            setAddress(props.restaurantDetails.address);
+            setLandMark(props.restaurantDetails.landmark);
+            setCity(props.restaurantDetails.city);
+            setPincode(props.restaurantDetails.pincode);
+            setStateX(props.restaurantDetails.state);
+            setLongitude(props.restaurantDetails.longitude);
+            setLatitude(props.restaurantDetails.latitude);
+            setIsPureVeg(props.restaurantDetails.is_pure_veg);
+            setImage(props.restaurantDetails.image)
+        }
+    }, [])
 
 
     const handleToClose = (event, reason) => {
@@ -98,7 +120,7 @@ const App = (props) => {
         setError(null);
         // console.log(file[0].name);
         setOpenBackdropUpload(false);
-        setBackdropImage(file);
+        setImage(file);
     };
 
 
@@ -108,12 +130,27 @@ const App = (props) => {
 
     const onSave = () => {
         navigate('/menu')
+        const x = {
+            name: name,
+            speciality: speciality,
+            mobile: mobile,
+            other_mobile: otherMobile,
+            address: address,
+            landmark: landmark,
+            city: city,
+            pincode: pincode,
+            state: stateX,
+            longitude: longitude,
+            latitude: latitude,
+            is_pure_veg: isPureVeg,
+            image: image
+        }
+        props.setRestaurantDetails(x)
 
     };
 
     const selectMediaType = (event, valuesX) => {
-        setError(null);
-        console.log('selectMediaType ', valuesX);
+        setIsPureVeg(valuesX);
     };
 
     return (
@@ -152,6 +189,38 @@ const App = (props) => {
                         value={speciality}
                         onChange={(e) => setSpeciality(e.target.value)}
                     />
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <TextField
+                            id="primary_mobile"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            label="Primary Mobile"
+                            // InputLabelProps={{
+                            //     shrink: values.runtime ? true : false
+                            // }}
+                            type={'tel'}
+                            value={mobile}
+                            style={{ width: 200 }}
+                            onChange={(e) => setMobile(e.target.value)}
+                        />
+                        <TextField
+                            id="other_mobile"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            label="Other Mobiles"
+                            // InputLabelProps={{
+                            //     shrink: values.runtime ? true : false
+                            // }}
+                            type={'tel'}
+                            value={otherMobile}
+                            style={{ width: 400 }}
+                            onChange={(e) => setOtherMobile(e.target.value)}
+                        />
+                    </div>
                     <TextField
                         multiline
                         id="address"
@@ -300,7 +369,7 @@ const App = (props) => {
                                     color: 'rgba(222,184,135, .9)'
                                 }}
                             >
-                                {backdropImage ? backdropImage[0].name : null}
+                                {image ? image[0].name : null}
                             </Typography>
                         </div>
 
@@ -340,7 +409,8 @@ const App = (props) => {
                             height: 45,
                             width: 200,
                             marginLeft: 90,
-                            marginTop: 20
+                            marginTop: 20,
+                            marginBottom: 15
                         }}
                         onClick={() => onSave()}
                     >
@@ -382,12 +452,14 @@ const App = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-    dishArray: state.AppReducer.dishArray
+    dishArray: state.AppReducer.dishArray,
+    restaurantDetails: state.AppReducer.restaurantDetails
 });
 
 const mapDispatchToProps = {
     setDishArray,
-    setClickedItem
+    setClickedItem,
+    setRestaurantDetails
 };
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(App));
 

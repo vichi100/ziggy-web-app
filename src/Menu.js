@@ -314,15 +314,18 @@ const Menu = (props) => {
                         // alignItems: 'center'
                     }}
                 >
-                    <div style={{ border: '0.5px solid rgba(105,105,105, .3)', height: 500, marginRight: 10 }}>
+                    <div style={{ border: '0.5px solid rgba(105,105,105, .3)', height: 500, marginRight: 10, }}>
                         <div style={{ position: 'relative', top: -15, left: 15 }}>
                             <Typography style={{ fontWeight: '600', fontSize: 20 }}>Menu</Typography>
                         </div>
-                        <MovieList
+                        {props.dishArray.length > 0 ? <MovieList
                             // dishArray={props.dishArray}
                             setSelectedDish={(movieData) => setSelectedDish(movieData)}
                             classes={{ listItemClicked: 'clickedItemStyle', listItemNotClicked: '' }}
-                        />
+                        /> :
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Typography style={{ fontWeight: '600', fontSize: 16, padding: 50 }}>No dish</Typography>
+                            </div>}
                     </div>
 
                     <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginLeft: 20 }}>
@@ -396,7 +399,7 @@ const Menu = (props) => {
                                             />
 
                                             {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
-                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "#FF0000", cursor: "pointer" }}>X</Typography>
+                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
                                             </div> : null}
 
                                         </div>
@@ -430,7 +433,7 @@ const Menu = (props) => {
                                             />
 
                                             {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
-                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "#FF0000", cursor: "pointer" }}>X</Typography>
+                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
                                             </div> : null}
 
                                         </div>

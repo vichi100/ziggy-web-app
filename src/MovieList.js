@@ -98,11 +98,11 @@ const MovieList = (props) => {
 				>
 					<ListItemIcon >
 						{props.clickedItem && props.clickedItem === item.dish_name && (
-							<DoneIcon style={{ color: 'rgb(239, 239, 239)', fontSize: '2.2rem' }} />
+							<DoneIcon style={{ color: 'rgb(102,205,170)', fontSize: '2.2rem' }} />
 						)}
 					</ListItemIcon>
 					<ListItemText primary={item.dish_name} onClick={() => handleClick(item)} style={{ cursor: "pointer" }} />
-					<CancelIcon style={{ color: 'rgb(239, 239, 239)', fontSize: '14', marginLeft: 20 }} onClick={() => removeFromMenu(item)} />
+					<CancelIcon style={{ color: 'rgb(250,128,114)', fontSize: '14', marginLeft: 20, cursor: "pointer" }} onClick={() => removeFromMenu(item)} />
 				</ListItem>
 				<Divider />
 			</div>
@@ -111,7 +111,7 @@ const MovieList = (props) => {
 		setListItems(listItemsX);
 	};
 
-	return <List style={{ maxHeight: 500, overflow: 'auto' }}>{listItems}</List>;
+	return <List style={{ maxHeight: 500, minWidth: 300, overflow: 'auto' }}>{listItems}</List>;
 };
 
 // export default MovieList;

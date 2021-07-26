@@ -23,6 +23,10 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import { DropzoneDialog, DropzoneArea } from 'material-ui-dropzone';
 import axios from 'axios';
+
+import { connect } from 'react-redux';
+import { setDishArray, setClickedItem } from './reducer/Action';
+
 //https://github.com/Yuvaleros/material-ui-dropzone
 
 const SERVER_URL = 'http://flicksickserver.com';
@@ -58,153 +62,21 @@ const styles = (theme) => ({
 
 const App = (props) => {
     const { classes } = props;
-    const [title, setTitle] = useState(null);
-    const [releaseYear, setReleaseYear] = useState(null);
-    const [genresDict, setGenresDict] = useState({});
-    const [media, setMedia] = useState(null);
-    const [selectedGenresArray, setSelectedGenresArray] = useState([]);
-    const [values, setValues] = useState([]);
+    const [name, setName] = useState(null);
+    const [speciality, setSpeciality] = useState(null);
+    const [address, setAddress] = useState(null);
+    const [landmark, setLandMark] = useState(null);
+    const [city, setCity] = useState(null);
+    const [pincode, setPincode] = useState(null);
+    const [stateX, setStateX] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [isPureVeg, setIsPureVeg] = useState(null);
     const [openBackdropUpload, setOpenBackdropUpload] = useState(false);
-    const [posterImage, setPosterImage] = useState(null);
     const [backdropImage, setBackdropImage] = useState(null);
     const [error, setError] = useState(null);
-    const [movieAlreadyPresentFlag, setMovieAlreadyPresentFlag] = useState(false);
-    const [movieDataFromDB, setMovieDataFromDB] = useState(null);
     const [open, setOpen] = useState(false);
     const [responseMessage, setResponseMessage] = useState(null);
-    const [dishArray, setDishArray] = useState([]);
-
-
-    const Dish = () => {
-        return (
-
-
-            <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginTop: 30, margin: 50 }}>
-                <div style={{ position: 'relative', top: -15, left: 15 }}>
-                    <Typography style={{ fontWeight: '600', fontSize: 20 }}>Dish</Typography>
-                </div>
-
-
-                <TextField
-                    id="dish_name"
-                    autoComplete="off"
-                    className={classes.textField}
-                    variant="outlined"
-                    // type={this.state.showPassword ? 'text' : 'password'}
-                    label="Dish Name"
-                    value={title}
-                    onChange={(e) => onChangeTitle(e)}
-                />
-                <TextField
-                    multiline
-                    id="details"
-                    autoComplete="off"
-                    className={classes.textField}
-                    variant="outlined"
-                    // type={this.state.showPassword ? 'text' : 'password'}
-                    // InputLabelProps={{
-                    //     shrink: values.overview ? true : false
-                    // }}
-                    label="Details / Ingredients"
-                    value={values.overview}
-                    onChange={(e) => handleInputChange(e)}
-                />
-                <TextField
-                    id="landmark"
-                    autoComplete="off"
-                    className={classes.textField}
-                    variant="outlined"
-                    // type={this.state.showPassword ? 'text' : 'password'}
-                    label="Landmark"
-                    value={title}
-                    onChange={(e) => onChangeTitle(e)}
-                />
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TextField
-                        id="quantity"
-                        autoComplete="off"
-                        className={classes.textField}
-                        variant="outlined"
-                        // type={this.state.showPassword ? 'text' : 'password'}
-                        label="Quantity"
-                        // InputLabelProps={{
-                        //     shrink: values.runtime ? true : false
-                        // }}
-                        type={'tel'}
-                        value={values.runtime}
-                        style={{ width: 300 }}
-                        onChange={(e) => handleInputChange(e)}
-                    />
-                    <TextField
-                        id="price"
-                        autoComplete="off"
-                        className={classes.textField}
-                        variant="outlined"
-                        type={'tel'}
-                        // type={this.state.showPassword ? 'text' : 'password'}
-                        label="Price"
-                        value={releaseYear}
-                        style={{ width: 300 }}
-                        onChange={(e) => onChangeReleaseYear(e)}
-                    />
-
-                </div>
-
-                <div style={{ flex: 1, flexDirection: "column" }}>
-
-                    <div style={{ display: 'flex', flexDirection: 'row', margin: 15 }}>
-                        <Typography style={{ textAlign: 'center', marginTop: 30 }}>Is Veg ? </Typography>
-                        <div style={{ marginLeft: 50 }}>
-                            <RadioGroup
-                                aria-label="mediaType"
-                                name="mediaType"
-                                value={media}
-                                onChange={selectMediaType}
-                            >
-                                <FormControlLabel
-                                    value="yes"
-                                    control={<Radio checked={media && media === 'movie' ? true : false} />}
-                                    label="Yes"
-                                />
-                                <FormControlLabel
-                                    value="no"
-                                    control={<Radio checked={media && media === 'series' ? true : false} />}
-                                    label="No"
-                                />
-                            </RadioGroup>
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
-                        <Button
-                            style={{ border: '0.3px solid rgba(105,105,105, .9)' }}
-                            onClick={() => handleBackdropOpen()}
-                        >
-                            Add Image
-                        </Button>
-                        <Typography
-                            style={{
-                                fontWeight: '500',
-                                fontSize: 16,
-                                marginLeft: 50,
-                                color: 'rgba(222,184,135, .9)'
-                            }}
-                        >
-                            {backdropImage ? backdropImage[0].name : null}
-                        </Typography>
-                    </div>
-
-                </div>
-            </div>
-
-
-        )
-    };
-
-    const addDish = () => {
-        const x = [...dishArray, <Dish />];
-        setDishArray(x);
-    }
-
 
 
     const handleToClose = (event, reason) => {
@@ -218,25 +90,9 @@ const App = (props) => {
         window.location.reload();
     };
 
-    const handleInputChange = (e) => {
-        setError(null);
-        const { id, value } = e.target;
-        console.log(id, value);
-        setValues({
-            ...values,
-            [id]: value
-        });
-    };
-
-
-
-
-
     const handleBackdropClose = () => {
         setOpenBackdropUpload(false);
     };
-
-
 
     const handleBackdropImageSave = (file) => {
         setError(null);
@@ -246,13 +102,11 @@ const App = (props) => {
     };
 
 
-
     const handleBackdropOpen = () => {
         setOpenBackdropUpload(true);
     };
 
     const onSave = () => {
-        console.log('title: ', title);
         navigate('/menu')
 
     };
@@ -260,22 +114,7 @@ const App = (props) => {
     const selectMediaType = (event, valuesX) => {
         setError(null);
         console.log('selectMediaType ', valuesX);
-        setMedia(valuesX);
     };
-
-    const onChangeTitle = (e) => {
-        const titleX = e.target.value;
-        setTitle(titleX);
-        // searchMovie();
-    };
-
-    const onChangeReleaseYear = (e) => {
-        const year = e.target.value;
-        setReleaseYear(year);
-        // searchMovie();
-    };
-
-
 
     return (
         <ThemeProvider theme={theme}>
@@ -294,14 +133,24 @@ const App = (props) => {
                         <Typography style={{ fontWeight: '600', fontSize: 20 }}>Restaurant Details</Typography>
                     </div>
                     <TextField
-                        id="title"
+                        id="name"
                         autoComplete="off"
                         className={classes.textField}
                         variant="outlined"
                         // type={this.state.showPassword ? 'text' : 'password'}
                         label="Restaurant Name"
-                        value={title}
-                        onChange={(e) => onChangeTitle(e)}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                    <TextField
+                        id="speciality"
+                        autoComplete="off"
+                        className={classes.textField}
+                        variant="outlined"
+                        // type={this.state.showPassword ? 'text' : 'password'}
+                        label="Speciality"
+                        value={speciality}
+                        onChange={(e) => setSpeciality(e.target.value)}
                     />
                     <TextField
                         multiline
@@ -314,8 +163,8 @@ const App = (props) => {
                         //     shrink: values.overview ? true : false
                         // }}
                         label="Address (House No, Building, Street, Area)"
-                        value={values.overview}
-                        onChange={(e) => handleInputChange(e)}
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                     />
                     <TextField
                         id="landmark"
@@ -324,8 +173,8 @@ const App = (props) => {
                         variant="outlined"
                         // type={this.state.showPassword ? 'text' : 'password'}
                         label="Landmark"
-                        value={title}
-                        onChange={(e) => onChangeTitle(e)}
+                        value={landmark}
+                        onChange={(e) => setLandMark(e.target.value)}
                     />
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <TextField
@@ -339,9 +188,9 @@ const App = (props) => {
                             //     shrink: values.runtime ? true : false
                             // }}
                             type={'tel'}
-                            value={values.runtime}
+                            value={city}
                             style={{ width: 300 }}
-                            onChange={(e) => handleInputChange(e)}
+                            onChange={(e) => setCity(e.target.value)}
                         />
                         <TextField
                             id="pin"
@@ -351,9 +200,9 @@ const App = (props) => {
                             type={'tel'}
                             // type={this.state.showPassword ? 'text' : 'password'}
                             label="Pin"
-                            value={releaseYear}
+                            value={pincode}
                             style={{ width: 300 }}
-                            onChange={(e) => onChangeReleaseYear(e)}
+                            onChange={(e) => setPincode(e.target.value)}
                         />
                         <TextField
                             id="state"
@@ -363,9 +212,9 @@ const App = (props) => {
                             type={'tel'}
                             // type={this.state.showPassword ? 'text' : 'password'}
                             label="State"
-                            value={releaseYear}
+                            value={stateX}
                             style={{ width: 300 }}
-                            onChange={(e) => onChangeReleaseYear(e)}
+                            onChange={(e) => setStateX(e.target.value)}
                         />
                     </div>
 
@@ -381,9 +230,9 @@ const App = (props) => {
                             //     shrink: values.runtime ? true : false
                             // }}
                             type={'tel'}
-                            value={values.runtime}
+                            value={longitude}
                             style={{ width: 300 }}
-                            onChange={(e) => handleInputChange(e)}
+                            onChange={(e) => setLongitude(e.target.value)}
                         />
                         <TextField
                             id="latitude"
@@ -396,29 +245,29 @@ const App = (props) => {
                             //     shrink: values.runtime ? true : false
                             // }}
                             type={'tel'}
-                            value={values.runtime}
+                            value={latitude}
                             style={{ width: 300 }}
-                            onChange={(e) => handleInputChange(e)}
+                            onChange={(e) => setLatitude(e.target.value)}
                         />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'row', margin: 15 }}>
-                        <Typography style={{ textAlign: 'center', marginTop: 30 }}>Is Pure Veg ? </Typography>
+                        <Typography style={{ textAlign: 'center', marginTop: 30 }}>Is Pure Veg Restaurant ? </Typography>
                         <div style={{ marginLeft: 50 }}>
                             <RadioGroup
                                 aria-label="mediaType"
                                 name="mediaType"
-                                value={media}
+                                value={isPureVeg}
                                 onChange={selectMediaType}
                             >
                                 <FormControlLabel
                                     value="yes"
-                                    control={<Radio checked={media && media === 'movie' ? true : false} />}
+                                    control={<Radio checked={isPureVeg && isPureVeg === 'yes' ? true : false} />}
                                     label="Yes"
                                 />
                                 <FormControlLabel
                                     value="no"
-                                    control={<Radio checked={media && media === 'series' ? true : false} />}
+                                    control={<Radio checked={isPureVeg && isPureVeg === 'no' ? true : false} />}
                                     label="No"
                                 />
                             </RadioGroup>
@@ -532,4 +381,14 @@ const App = (props) => {
     );
 };
 
-export default withStyles(styles)(App);
+const mapStateToProps = (state) => ({
+    dishArray: state.AppReducer.dishArray
+});
+
+const mapDispatchToProps = {
+    setDishArray,
+    setClickedItem
+};
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(App));
+
+// export default withStyles(styles)(App);

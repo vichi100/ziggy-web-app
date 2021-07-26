@@ -27,7 +27,9 @@ import { connect } from 'react-redux';
 import { setDishArray, setClickedItem } from './reducer/Action';
 //https://github.com/Yuvaleros/material-ui-dropzone
 
-const SERVER_URL = 'http://flicksickserver.com';
+import { SERVER_URL } from "./Constant"
+
+// const SERVER_URL = 'http://flicksickserver.com';
 // const SERVER_URL_PROD = 'http://flicksickapp.com';
 // const SERVER_URL_DEV = 'http://192.168.0.101:3050';
 
@@ -56,9 +58,6 @@ const styles = (theme) => ({
     // },
 });
 
-
-
-
 const Menu = (props) => {
     const { classes } = props;
     const [dishName, setDishName] = useState(null);
@@ -75,6 +74,10 @@ const Menu = (props) => {
     // const [dishArray, setDishArray] = useState([])
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
+
+    // useEffect(()=>{
+    //     if(props.dishArray && props.dishArray.length > 0)
+    // })
 
     const onChangeQuntity = (quantityX) => {
         var isAbort = false;
@@ -293,6 +296,30 @@ const Menu = (props) => {
 
     };
 
+    const saveMenu = () => {
+        console.log("saveMenu")
+        const obj = {
+            restaurant_details: props.restaurantDetails,
+            menu_with_dish_list: props.dishArray
+        };
+        axios(SERVER_URL + '/addNewRestaurant', {
+            method: 'post',
+            // headers: {
+            // 	'Content-type': 'Application/json',
+            // 	// 'Content-type': 'application/x-www-form-urlencoded',
+            // 	Accept: 'Application/json'
+            // },
+            data: obj
+        })
+            .then((res) => {
+                const movieArr = res.data;
+                console.log('movieArr', movieArr);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -502,11 +529,24 @@ const Menu = (props) => {
                         flexDirection: 'row',
                         // margin: 15,
                         display: 'flex',
-                        justifyContent: "flex-end"
-                        // alignContent: 'flex-end',
+                        justifyContent: "center",
+                        alignContent: 'center',
                         // alignItems: 'flex-end'
                     }}
                 >
+
+                    <Button
+                        style={{
+                            border: '0.3px solid rgba(102,205,170, .9)',
+                            height: 45,
+                            width: 200,
+                            // marginLeft: 90,
+                            marginTop: 20
+                        }}
+                        onClick={() => saveMenu()}
+                    >
+                        SAVE MENU
+                    </Button>
 
                     <Button
                         style={{
@@ -559,7 +599,8 @@ const Menu = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-    dishArray: state.AppReducer.dishArray
+    dishArray: state.AppReducer.dishArray,
+    restaurantDetails: state.AppReducer.restaurantDetails
 });
 
 const mapDispatchToProps = {

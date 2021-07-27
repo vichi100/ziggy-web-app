@@ -195,6 +195,7 @@ const Menu = (props) => {
         const dishObj = {
             dish_name: dishName,
             details: details,
+            category: category,
             price_details: priceDetails,
             is_veg: isVeg, // yes , no
         }
@@ -206,7 +207,6 @@ const Menu = (props) => {
                 item.category = category;
                 item.price_details = priceDetails;
                 item.is_veg = isVeg
-                isUpdated = true;
             }
         })
         if (isUpdated) {

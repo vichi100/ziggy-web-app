@@ -62,6 +62,7 @@ const Menu = (props) => {
     const { classes } = props;
     const [dishName, setDishName] = useState(null);
     const [details, setDetails] = useState(null);
+    const [category, setCategory] = useState(null)
     const [price, setPrice] = useState(null);
     const [quantity, setQuantity] = useState(null);
     const [priceDetails, setPriceDetails] = useState([{
@@ -79,50 +80,59 @@ const Menu = (props) => {
     //     if(props.dishArray && props.dishArray.length > 0)
     // })
 
-    const onChangeQuntity = (quantityX) => {
-        var isAbort = false;
+    const onChangeQuntity = (quantityX, index) => {
+        console.log(quantityX)
+        setOpen(false);
+        // var isAbort = false;
         priceDetails.map(item => {
             if (item.quantity === quantityX) {
                 setError("Quantity already exist");
                 setOpen(true);
-                isAbort = true;
+                // isAbort = true;
             }
         })
-        if (isAbort) {
-            return;
-        }
+        // if (isAbort) {
+        //     return;
+        // }
+        const item = priceDetails[index]
+        item.quantity = quantityX;
 
-        priceDetails.map(item => {
-            if (item.quantity === '') {
-                item.quantity = quantityX;
-
-            }
-        })
 
         setQuantity(quantityX);
 
     }
 
-    const onChangePrice = (priceX) => {
+    const onChangePrice = (priceX, index) => {
+        console.log('onChangePrice price: ', priceX)
+        console.log('onChangePrice index: ', index);
         if (priceX && priceX.trim().length === 0) {
             setError("Price is missing");
             setOpen(true);
             return;
         }
+        setOpen(false);
         console.log('onChangePrice priceDetails: ', priceDetails)
-        var isPriceSet = false
-        priceDetails.map(item => {
-            if (item.price === '') {
-                item.price = priceX;
-                isPriceSet = true;
-            }
-        })
+        // var isPriceSet = false
+        // priceDetails.map(item => {
+        //     if (item.price === '') {
+        //         item.price = priceX;
+        //         isPriceSet = true;
+        //     }
+        // })
 
-        if (!isPriceSet) {
+        // if (!isPriceSet) {
+        //     setError("Quntity is missing");
+        //     setOpen(true);
+        //     return;
+        // }
+        const item = priceDetails[index];
+        if (item.quantity && item.quantity.trim() === '') {
             setError("Quntity is missing");
             setOpen(true);
             return;
         }
+        setOpen(false);
+        item.price = priceX;
         setPrice(priceX)
     }
 
@@ -188,21 +198,12 @@ const Menu = (props) => {
             setOpen(true);
             return
         }
-        var isAnyPriceDetailsValueMissing = false
-        priceDetails.map(item => {
-            if (item.price === null || item.price.trim() === '') {
-                setError("Price is missing");
-                isAnyPriceDetailsValueMissing = true
-                return
-            }
-            if (item.quantity === null || item.quantity.trim() === '') {
-                setError("Quntity is missing");
-                isAnyPriceDetailsValueMissing = true;
-                return
-            }
+        var hasDuplicate = false;
+        priceDetails.map(v => v.quantity).sort().sort((a, b) => {
+            if (a === b) hasDuplicate = true
         })
-
-        if (isAnyPriceDetailsValueMissing) {
+        if (hasDuplicate) {
+            setError("Quantity is duplicate")
             setOpen(true);
             return
         }
@@ -220,6 +221,7 @@ const Menu = (props) => {
         props.dishArray.map(item => {
             if (item.dish_name === dishName) {
                 item.details = details;
+                item.category = category;
                 item.price_details = priceDetails;
                 item.is_veg = isVeg
                 isUpdated = true;
@@ -236,6 +238,7 @@ const Menu = (props) => {
 
     const clearState = () => {
         setDishName('');
+        setCategory('')
         setDetails('');
         setQuantity('');
         setPrice('');
@@ -386,88 +389,64 @@ const Menu = (props) => {
                             onChange={(e) => setDetails(e.target.value)}
                         />
 
-                        {priceDetails && priceDetails.length > 0 ?
-                            priceDetails.map(item => {
+                        <TextField
+                            id="category"
+                            autoComplete="off"
+                            className={classes.textField}
+                            variant="outlined"
+                            // type={this.state.showPassword ? 'text' : 'password'}
+                            label="Category like breakfast, main course, desert etc"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                        />
+
+                        {
+                            priceDetails.map((item, index) => {
                                 return (
 
-                                    item.price && item.price.length > 0 ?
-                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
-                                            <TextField
-                                                id="quantity"
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Quantity"
-                                                InputLabelProps={{
-                                                    shrink: item.quantity ? true : false
-                                                }}
-                                                type={'tel'}
-                                                // defaultValue={item.quantity}
-                                                value={item.quantity}
-                                                style={{ width: 300 }}
-                                            // onChange={(e) => setQuantity(e.target.value)}
-                                            />
-                                            <TextField
-                                                id="price"
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                type={'tel'}
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Price"
-                                                InputLabelProps={{
-                                                    shrink: item.price ? true : false
-                                                }}
-                                                // defaultValue={item.price}
-                                                value={item.price}
-                                                style={{ width: 300 }}
-                                            // onChange={(e) => setPrice(e.target.value)}
-                                            />
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
+                                        <TextField
+                                            id={"quantity" + index}
+                                            autoComplete="off"
+                                            className={classes.textField}
+                                            variant="outlined"
+                                            // type={this.state.showPassword ? 'text' : 'password'}
+                                            label="Quantity"
+                                            InputLabelProps={{
+                                                shrink: item.quantity ? true : false
+                                            }}
+                                            type={'tel'}
+                                            // defaultValue={item.quantity}
+                                            value={item.quantity}
+                                            style={{ width: 300 }}
+                                            onChange={(e) => onChangeQuntity(e.target.value, index)}
+                                        />
+                                        <TextField
+                                            id={"price" + index}
+                                            autoComplete="off"
+                                            className={classes.textField}
+                                            variant="outlined"
+                                            type={'tel'}
+                                            // type={this.state.showPassword ? 'text' : 'password'}
+                                            label="Price"
+                                            InputLabelProps={{
+                                                shrink: item.price ? true : false
+                                            }}
+                                            // defaultValue={item.price}
+                                            value={item.price}
+                                            style={{ width: 300 }}
+                                            onChange={(e) => onChangePrice(e.target.value, index)}
+                                        />
 
-                                            {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
-                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
-                                            </div> : null}
+                                        {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
+                                            <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
+                                        </div> : null}
 
-                                        </div>
-                                        : <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
-                                            <TextField
-                                                id="quantity"
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Quantity"
-                                                // InputLabelProps={{
-                                                //     shrink: values.runtime ? true : false
-                                                // }}
-                                                type={'tel'}
-                                                value={quantity}
-                                                style={{ width: 300 }}
-                                                onChange={(e) => onChangeQuntity(e.target.value)}
-                                            />
-                                            <TextField
-                                                id="price"
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                type={'tel'}
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Price"
-                                                value={price}
-                                                style={{ width: 300 }}
-                                                onChange={(e) => onChangePrice(e.target.value)}
-                                            />
+                                    </div>
 
-                                            {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
-                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
-                                            </div> : null}
-
-                                        </div>
                                 )
                             })
-
-                            : null}
+                        }
                         <div style={{ display: 'flex', justifyContent: "flex-end" }} onClick={() => addPriceDetails()}>
                             <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 12, color: "#00BFFF" }}>Add More Quantity / Price</Typography>
                         </div>

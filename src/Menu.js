@@ -76,24 +76,18 @@ const Menu = (props) => {
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
 
-    // useEffect(()=>{
-    //     if(props.dishArray && props.dishArray.length > 0)
-    // })
+
 
     const onChangeQuntity = (quantityX, index) => {
         console.log(quantityX)
         setOpen(false);
-        // var isAbort = false;
         priceDetails.map(item => {
             if (item.quantity === quantityX) {
                 setError("Quantity already exist");
                 setOpen(true);
-                // isAbort = true;
             }
         })
-        // if (isAbort) {
-        //     return;
-        // }
+
         const item = priceDetails[index]
         item.quantity = quantityX;
 
@@ -112,19 +106,7 @@ const Menu = (props) => {
         }
         setOpen(false);
         console.log('onChangePrice priceDetails: ', priceDetails)
-        // var isPriceSet = false
-        // priceDetails.map(item => {
-        //     if (item.price === '') {
-        //         item.price = priceX;
-        //         isPriceSet = true;
-        //     }
-        // })
 
-        // if (!isPriceSet) {
-        //     setError("Quntity is missing");
-        //     setOpen(true);
-        //     return;
-        // }
         const item = priceDetails[index];
         if (item.quantity && item.quantity.trim() === '') {
             setError("Quntity is missing");

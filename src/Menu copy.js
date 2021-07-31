@@ -75,7 +75,6 @@ const Menu = (props) => {
     // const [dishArray, setDishArray] = useState([])
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
-    const [isCustomizable, setIsCustomizable] = useState(-1);// 1 = yes, 0 = no
 
 
 
@@ -342,7 +341,7 @@ const Menu = (props) => {
                             </div>}
                     </div>
 
-                    <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginLeft: 20, minWidth: 600 }}>
+                    <div style={{ border: '0.5px solid rgba(105,105,105, .3)', marginLeft: 20 }}>
                         <div style={{ position: 'relative', top: -15, left: 15 }}>
                             <Typography style={{ fontWeight: '600', fontSize: 20 }}>Dish</Typography>
                         </div>
@@ -372,31 +371,6 @@ const Menu = (props) => {
                             value={details}
                             onChange={(e) => setDetails(e.target.value)}
                         />
-                        <div style={{ display: 'flex', flexDirection: 'row', margin: 15 }}>
-                            <Typography style={{ textAlign: 'center', marginTop: 15 }}>Is Veg ? </Typography>
-                            <div style={{ marginLeft: 50, flexDirection: 'row', display: 'flex', }}>
-                                <RadioGroup
-                                    aria-label="mediaType"
-                                    name="mediaType"
-                                    value={isVeg}
-                                    onChange={selectDishType}
-                                    style={{ marginLeft: 50, flexDirection: 'row', display: 'flex', }}
-                                >
-                                    <FormControlLabel
-                                        value="yes"
-                                        control={<Radio checked={isVeg && isVeg === 'yes' ? true : false} />}
-                                        label="Yes"
-                                        style={{ color: "#32CD32", fontWeight: "800" }}
-                                    />
-                                    <FormControlLabel
-                                        value="no"
-                                        control={<Radio checked={isVeg && isVeg === 'no' ? true : false} />}
-                                        label="No"
-                                        style={{ color: "#FF6347", fontSize: 16, fontWeight: "800" }}
-                                    />
-                                </RadioGroup>
-                            </div>
-                        </div>
 
                         <TextField
                             id="category"
@@ -409,92 +383,82 @@ const Menu = (props) => {
                             onChange={(e) => setCategory(e.target.value)}
                         />
 
-
-                        <div style={{ flexDirection: "row", justifyContent: "space-between", display: "flex", margin: 20, }}>
-                            <Typography onClick={() => setIsCustomizable(0)} style={{ fontSize: 12, color: "#00BFFF" }}>Add Quantity / Price</Typography>
-                            <Typography onClick={() => setIsCustomizable(1)} style={{ fontSize: 12, color: "#00BFFF" }}>Customizable Dish</Typography>
-
-                        </div>
-
-
-
                         {
-                            isCustomizable === 0 ?
-                                priceDetails.map((item, index) => {
-                                    return (
+                            priceDetails.map((item, index) => {
+                                return (
 
-                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
-                                            <TextField
-                                                id={"quantity" + index}
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Quantity"
-                                                InputLabelProps={{
-                                                    shrink: item.quantity ? true : false
-                                                }}
-                                                type={'tel'}
-                                                // defaultValue={item.quantity}
-                                                value={item.quantity}
-                                                style={{ width: 300 }}
-                                                onChange={(e) => onChangeQuntity(e.target.value, index)}
-                                            />
-                                            <TextField
-                                                id={"price" + index}
-                                                autoComplete="off"
-                                                className={classes.textField}
-                                                variant="outlined"
-                                                type={'tel'}
-                                                // type={this.state.showPassword ? 'text' : 'password'}
-                                                label="Price"
-                                                InputLabelProps={{
-                                                    shrink: item.price ? true : false
-                                                }}
-                                                // defaultValue={item.price}
-                                                value={item.price}
-                                                style={{ width: 300 }}
-                                                onChange={(e) => onChangePrice(e.target.value, index)}
-                                            />
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
+                                        <TextField
+                                            id={"quantity" + index}
+                                            autoComplete="off"
+                                            className={classes.textField}
+                                            variant="outlined"
+                                            // type={this.state.showPassword ? 'text' : 'password'}
+                                            label="Quantity"
+                                            InputLabelProps={{
+                                                shrink: item.quantity ? true : false
+                                            }}
+                                            type={'tel'}
+                                            // defaultValue={item.quantity}
+                                            value={item.quantity}
+                                            style={{ width: 300 }}
+                                            onChange={(e) => onChangeQuntity(e.target.value, index)}
+                                        />
+                                        <TextField
+                                            id={"price" + index}
+                                            autoComplete="off"
+                                            className={classes.textField}
+                                            variant="outlined"
+                                            type={'tel'}
+                                            // type={this.state.showPassword ? 'text' : 'password'}
+                                            label="Price"
+                                            InputLabelProps={{
+                                                shrink: item.price ? true : false
+                                            }}
+                                            // defaultValue={item.price}
+                                            value={item.price}
+                                            style={{ width: 300 }}
+                                            onChange={(e) => onChangePrice(e.target.value, index)}
+                                        />
 
-                                            {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
-                                                <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
-                                            </div> : null}
+                                        {priceDetails && priceDetails.length > 1 ? <div style={{ display: 'flex', justifyContent: "flex-end", }} onClick={(e) => removePriceDetails(e, item)}>
+                                            <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 14, color: "rgb(250,128,114)", cursor: "pointer" }}>X</Typography>
+                                        </div> : null}
 
-                                        </div>
+                                    </div>
 
-                                    )
-                                }) : null
+                                )
+                            })
                         }
-
-                        {isCustomizable === 0 ? <div style={{ display: 'flex', justifyContent: "flex-end" }} onClick={() => addPriceDetails()}>
+                        <div style={{ display: 'flex', justifyContent: "flex-end" }} onClick={() => addPriceDetails()}>
                             <Typography style={{ textAlign: 'center', marginRight: 20, fontSize: 12, color: "#00BFFF" }}>Add More Quantity / Price</Typography>
-                        </div> : null}
-
-
-                        {isCustomizable === 1 ? <div>
-                            <TextField
-                                id="header"
-                                autoComplete="off"
-                                className={classes.textField}
-                                variant="outlined"
-                                // type={this.state.showPassword ? 'text' : 'password'}
-                                label="Header"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                            />
-                            <div style={{ flexDirection: "row", justifyContent: "space-between", display: "flex", margin: 20, }}>
-                                <Typography onClick={() => setIsCustomizable(0)} style={{ fontSize: 12, color: "#00BFFF" }}>Add Checkbox</Typography>
-                                <Typography onClick={() => setIsCustomizable(1)} style={{ fontSize: 12, color: "#00BFFF" }}>Add Radio Button</Typography>
-
-                            </div>
-
-                        </div> : null}
+                        </div>
 
 
                         <div style={{ flex: 1, flexDirection: "column" }}>
 
-
+                            <div style={{ display: 'flex', flexDirection: 'row', margin: 15 }}>
+                                <Typography style={{ textAlign: 'center', marginTop: 30 }}>Is Veg ? </Typography>
+                                <div style={{ marginLeft: 50 }}>
+                                    <RadioGroup
+                                        aria-label="mediaType"
+                                        name="mediaType"
+                                        value={isVeg}
+                                        onChange={selectDishType}
+                                    >
+                                        <FormControlLabel
+                                            value="yes"
+                                            control={<Radio checked={isVeg && isVeg === 'yes' ? true : false} />}
+                                            label="Yes"
+                                        />
+                                        <FormControlLabel
+                                            value="no"
+                                            control={<Radio checked={isVeg && isVeg === 'no' ? true : false} />}
+                                            label="No"
+                                        />
+                                    </RadioGroup>
+                                </div>
+                            </div>
                             <div style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
                                 <Button
                                     style={{ border: '0.3px solid rgba(105,105,105, .9)' }}
@@ -608,24 +572,3 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Menu));
 
 // export default withStyles(styles)(Menu);
-
-const customObj = [
-    {
-        header: String,
-        children_type: "radio", // checkbox
-        children: [
-            {
-                name: String,
-                price: String,
-            }
-        ],
-
-    },
-    {
-        header: String,
-        children_type: "checkbox", // checkbox
-        children: [],
-
-    }
-]
-
